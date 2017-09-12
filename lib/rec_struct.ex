@@ -8,10 +8,10 @@ defmodule RecStruct do
     allRecords = for {recName, fields} <- extractedRecords do quote do Record.defrecord(unquote(recName), unquote(fields)) end end
 
     transformedExpr = Macro.prewalk(expr, 
-    fn ({:defmsg, meta, [par1, recordName]}) -> 
-        {:defmsg, meta, [par1, recordName, [fields: extractedRecords[recordName]]]}
-      ({:defmsg, meta, [par1, recordName, otherParams]}) -> 
-        {:defmsg, meta, [par1, recordName, otherParams ++ [fields: extractedRecords[recordName]]]}
+    fn ({:defrecstruct, meta, [par1, recordName]}) -> 
+        {:defrecstruct, meta, [par1, recordName, [fields: extractedRecords[recordName]]]}
+      ({:defrecstruct, meta, [par1, recordName, otherParams]}) -> 
+        {:defrecstruct, meta, [par1, recordName, otherParams ++ [fields: extractedRecords[recordName]]]}
       (otherwise) -> otherwise
     end)
 
@@ -32,7 +32,7 @@ defmodule RecStruct do
     end    
   end
 
-  defmacro defmsg(msgName, recordName, opts \\ []) do
+  defmacro defrecstruct(msgName, recordName, opts \\ []) do
     recordFields = case Access.get(opts, :convert_undefined, true) do
       true ->
         for {key, val} <- opts[:fields] do 

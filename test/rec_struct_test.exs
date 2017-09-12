@@ -6,8 +6,8 @@ defmodule RecStructTest do
     import RecStruct
 
     defheader TestHeader,  "test/test.hrl" do
-      defmsg TestRec, :test_record
-      defmsg OtherTestRec, :other_test_record, convert_undefined: false
+      defrecstruct TestRec, :test_record
+      defrecstruct OtherTestRec, :other_test_record, convert_undefined: false
     end
   end
 
