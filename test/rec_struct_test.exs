@@ -11,14 +11,14 @@ defmodule RecStructTest do
     end
   end
 
-
-  test "Convertint structures to records" do
+  test "Converting structures to records" do
     alias TestStructs.TestHeader.Structures, as: St
     alias TestStructs.TestHeader.Records, as: Rec
     require Rec
 
     assert Rec.test_record() == St.to_record(%St.TestRec{})
     assert Rec.test_record(St.to_record(%St.TestRec{}), :other_field) == :undefined
+    assert %St.TestRec{}.a_field == 15
     assert %St.TestRec{}.other_field == nil
   end
 
@@ -29,6 +29,7 @@ defmodule RecStructTest do
 
     assert St.to_struct(Rec.test_record()) == %St.TestRec{}
     assert St.to_struct(Rec.test_record()).other_field == nil
+    assert Rec.test_record(Rec.test_record(), :a_field) == 15
     assert Rec.test_record(Rec.test_record(), :other_field) == :undefined
   end
 
@@ -48,6 +49,7 @@ defmodule RecStructTest do
 
     assert St.to_struct(Rec.other_test_record()) == %St.OtherTestRec{}
     assert St.to_struct(Rec.other_test_record()).b == :undefined
+    assert Rec.other_test_record(St.to_record(St.to_struct(Rec.other_test_record())), :b) ==  :undefined
   end
 
 end

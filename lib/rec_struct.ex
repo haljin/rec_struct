@@ -2,8 +2,18 @@ defmodule RecStruct do
   @moduledoc """
   Documentation for RecStruct.
   """
+
   defmacro defheader(modName, filePath, do: expr) do
-    allRecords = for {recName, fields} <- Record.extract_all(from: filePath) do quote do Record.defrecord(unquote(recName), unquote(fields)) end end
+    extractedRecords = Record.extract_all(from: filePath)
+    allRecords = for {recName, fields} <- extractedRecords do quote do Record.defrecord(unquote(recName), unquote(fields)) end end
+
+    transformedExpr = Macro.prewalk(expr, 
+    fn ({:defmsg, meta, [par1, recordName]}) -> 
+        {:defmsg, meta, [par1, recordName, [fields: extractedRecords[recordName]]]}
+      ({:defmsg, meta, [par1, recordName, otherParams]}) -> 
+        {:defmsg, meta, [par1, recordName, otherParams ++ [fields: extractedRecords[recordName]]]}
+      (otherwise) -> otherwise
+    end)
 
     quote do      
       defmodule unquote(modName) do
@@ -16,7 +26,7 @@ defmodule RecStruct do
           require Records
           import Records
           
-          unquote(expr)
+          unquote(transformedExpr)
         end
       end     
     end    
@@ -25,14 +35,14 @@ defmodule RecStruct do
   defmacro defmsg(msgName, recordName, opts \\ []) do
     recordFields = case Access.get(opts, :convert_undefined, true) do
       true ->
-        for {key, val} <- Record.extract(recordName, from: "test/test.hrl") do 
+        for {key, val} <- opts[:fields] do 
           {key, case val do 
             :undefined -> nil
             val -> val
           end} 
         end
       false -> 
-        Record.extract(recordName, from: "test/test.hrl")
+        opts[:fields]
       _ -> 
         raise ArgumentError, "Wrong value for :convert_undefined. Only true or false allowed"
     end
