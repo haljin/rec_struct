@@ -19,7 +19,9 @@ defmodule RecStruct do
   @spec defheader(module, Path.t, [term]) :: none
   defmacro defheader(modName, filePath, do: expr) do
     extractedRecords = Record.extract_all(from: filePath)
-    allRecords = for {recName, fields} <- extractedRecords do quote do Record.defrecord(unquote(recName), unquote(fields)) end end
+    
+    allRecords = for {recName, fields} <- extractedRecords do
+      quote do Record.defrecord(unquote(recName), unquote(Macro.escape(fields))) end end
 
     transformedExpr = Macro.prewalk(expr, 
     fn ({:defrecstruct, meta, [par1, recordName]}) -> 
