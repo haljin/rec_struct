@@ -5,7 +5,7 @@ defmodule RecStructTest do
     require RecStruct
     import RecStruct
 
-    defheader TestHeader,  "test/test.hrl" do
+    defheader TestHeader, "test/test.hrl" do
       defrecstruct TestRec, :test_record
       defrecstruct OtherTestRec, :other_test_record, convert_undefined: false
     end
@@ -51,5 +51,7 @@ defmodule RecStructTest do
     assert St.to_struct(Rec.other_test_record()).b == :undefined
     assert Rec.other_test_record(St.to_record(St.to_struct(Rec.other_test_record())), :b) ==  :undefined
   end
+  
+  doctest RecStruct
 
 end
