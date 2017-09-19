@@ -160,7 +160,7 @@ defmodule RecStruct do
     quote do
       defmodule unquote(msgName) do
         @moduledoc false
-        defstruct unquote(recordFields)
+        defstruct unquote(Macro.escape(recordFields))
       end
 
       def to_record(%unquote(msgName){} = struct) do

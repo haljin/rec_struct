@@ -8,6 +8,7 @@ defmodule RecStructTest do
     defheader TestHeader, "test/test.hrl" do
       defrecstruct TestRec, :test_record
       defrecstruct OtherTestRec, :other_test_record, convert_undefined: false
+      defrecstruct RecWithSubRec, :record_with_subrecord
     end
   end
 
